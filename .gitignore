@@ -1,0 +1,9 @@
+# Ejecutables de prueba
+*.exe
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Archivos de respaldo
+*.bak

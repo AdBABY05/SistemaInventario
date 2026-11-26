@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pruebas C++ WebAssembly</title>
+</head>
+<body>
+
+    <h1>Pruebas C++ WebAssembly</h1>
+
+    <pre id="resultado">Cargando...</pre>
+
+    <script>
+        var Module = {
+
+            onRuntimeInitialized: function () {
+
+                const salida = document.getElementById("resultado");
+                let resultados = [];
+
+                try {
+
+                    let disponible = Module.ccall(
+                        'equipoDisponible', 'number', ['number'], [1]
+                    );
+
+                    resultados.push("Disponibilidad: " + disponible);
+
+                    let atraso = Module.ccall(
+                        'calcularAtraso', 'number', ['number'], [5]
+                    );
+
+                    resultados.push("Atraso: " + atraso);
+
+                    let cantidades = [2, 3, 4];
+                    let memoriaArreglo = Module._malloc(cantidades.length * 4);
+
+                    Module.HEAP32.set(cantidades, memoriaArreglo / 4);
+
+                    let total = Module.ccall(
+                        'calcularTotalEquipos',
+                        'number',
+                        ['number', 'number'],
+                        [memoriaArreglo, cantidades.length]
+                    );
+
+                    Module._free(memoriaArreglo);
+
+                    resultados.push("Arreglo: " + total);
+
+                    let memoria = Module._malloc(4);
+                    Module.HEAP32[memoria / 4] = 5;
+
+                    let duplicado = Module.ccall(
+                        'duplicarCantidad', 'number', ['number'], [memoria]
+                    );
+
+                    Module._free(memoria);
+
+                    resultados.push("Puntero: " + duplicado);
+
+                    let cadena = Module.ccall(
+                        'validarNombreEquipo', 'number', ['string'], ['Laptop']
+                    );
+
+                    resultados.push("Cadena: " + cadena);
+
+                    let estado = Module.ccall(
+                        'verificarEstadoEquipo', 'number', ['number'], [3]
+                    );
+
+                    resultados.push("Estructura: " + estado);
+
+                    let inventario = Module.ccall(
+                        'obtenerInventario', 'number', ['number'], [10]
+                    );
+
+                    resultados.push("POO: " + inventario);
+
+                    let validacion = Module.ccall(
+                        'validarCantidad', 'number', ['number'], [-5]
+                    );
+
+                    resultados.push("Excepciones: " + validacion);
+
+                    // Procesamiento de archivos
+                    let archivo = Module.ccall(
+                        'procesarArchivo', 'number', [], []
+                    );
+
+                    resultados.push(
+                        "Procesamiento de archivos: " +
+                        (archivo === 1 ? "Correcto" : "Error")
+                    );
+
+                    resultados.push("\nTODAS LAS PRUEBAS COMPLETADAS.");
+
+                    salida.textContent = resultados.join("\n");
+
+                } catch (error) {
+
+                    salida.textContent = "ERROR:\n" + error.stack;
+
+                }
+
+            }
+        };
+    </script>
+
+    <script src="cpp/build/inventario.js"></script>
+
+</body>
+</html>
